@@ -16,8 +16,6 @@ install_manifest.txt
 *Targets.cmake
 *Targets-*.cmake
 
-# Local (user-specific) CMake presets
-CMakeUserPresets.json
 
 # Conan package manager
 conan_toolchain.cmake
