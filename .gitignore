@@ -1,0 +1,89 @@
+# Build and cache outputs
+/out/
+/build/
+/bin/
+/.cache/
+/CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+install_manifest.txt
+
+# CMake generated files
+*Config.cmake
+*ConfigVersion.cmake
+*Targets.cmake
+*Targets-*.cmake
+
+# Local (user-specific) CMake presets
+CMakeUserPresets.json
+
+# Conan package manager
+conan_toolchain.cmake
+conan.lock
+conaninfo.txt
+conanbuildinfo.*
+graph_info.json
+deactivate_conanbuildenv-*.sh
+environment_*_*.sh.env
+
+# vcpkg package manager
+vcpkg_installed/
+
+# Visual Studio/VSCode
+.vs/
+*.vcxproj*
+*.sln*
+*.user
+*.opendb
+*.VC.db
+*.pyproj
+.vscode/
+
+# JetBrains IDEs (CLion, Rider, etc.)
+.idea/
+cmake-build-*/
+
+# IDE/macOS/Windows cruft
+.DS_Store
+Thumbs.db
+
+# Compiler/Linker products
+*.obj
+*.o
+*.lo
+*.la
+*.a
+*.lib
+*.exp
+*.pdb
+*.ilk
+*.dll
+*.exe
+*.so
+*.dylib
+*.pch
+*.pchi
+*.ipch
+
+# Logs and temp
+*.log
+*.cache
+*.tmp
+*.swp
+*.swo
+
+# Python artifacts
+*.pyc
+__pycache__/
+
+# Generated docs/artifacts
+*.html
+*.pdf
+
+# AI assistants
+.claude/
+CLAUDE.md
+.gemini/
+GEMINI.md

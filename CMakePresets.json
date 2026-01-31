@@ -1,0 +1,78 @@
+{
+    "version": 8,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 25,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install/${presetName}"
+            }
+        },
+        {
+            "name": "windows-base",
+            "hidden": true,
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "hostOS": [
+                        "Windows"
+                    ]
+                }
+            },
+            "cacheVariables": {
+                "VCPKG_OVERLAY_PORTS": "${sourceDir}/ports"
+            }
+        },
+        {
+            "name": "vs2022-base",
+            "inherits": "windows-base",
+            "displayName": "Visual Studio 2022 (x64)",
+            "description": "使用 Visual Studio 17 2022 (x64 架构)",
+            "generator": "Visual Studio 17 2022",
+            "toolset": "host=x64",
+            "architecture": "x64"
+        },
+        {
+            "name": "vs2017-base",
+            "inherits": "windows-base",
+            "displayName": "Visual Studio 2017 (x64)",
+            "description": "使用 Visual Studio 15 2017 (x64 架构)",
+            "generator": "Visual Studio 15 2017",
+            "toolset": "host=x64",
+            "architecture": "x64"
+        },
+        {
+            "name": "macos-base",
+            "hidden": true,
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
+            "vendor": {
+                "apple.com/Xcode/CMake/1.0": {
+                    "hostOS": [
+                        "macOS"
+                    ]
+                }
+            },
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "PACKAGE_MANAGER": "conan"
+            }
+        }
+    ]
+}
