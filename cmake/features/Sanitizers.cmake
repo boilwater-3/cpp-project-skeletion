@@ -1,0 +1,87 @@
+# Sanitizers.cmake
+# 为指定 target 启用 AddressSanitizer / UndefinedBehaviorSanitizer / ThreadSanitizer。
+# 仅通过 target_compile_options / target_link_options 注入，不污染全局作用域。
+
+function(apply_sanitizers)
+    set(multi_value_args TARGETS LINK_TARGETS)
+    cmake_parse_arguments(ARG "" "" "${multi_value_args}" ${ARGN})
+
+    if(NOT ENABLE_ASAN AND NOT ENABLE_UBSAN AND NOT ENABLE_TSAN)
+        message(STATUS "Sanitizers: Disabled")
+        return()
+    endif()
+    if(NOT ARG_TARGETS)
+        message(FATAL_ERROR "apply_sanitizers() requires TARGETS")
+    endif()
+    if(NOT ARG_LINK_TARGETS)
+        set(ARG_LINK_TARGETS ${ARG_TARGETS})
+    endif()
+
+    if(ENABLE_ASAN AND ENABLE_TSAN)
+        message(FATAL_ERROR "ENABLE_ASAN and ENABLE_TSAN cannot be enabled simultaneously")
+    endif()
+
+    set(_compile_flags)
+    set(_link_flags)
+    set(_enabled_names)
+
+    if(MSVC)
+        if(ENABLE_ASAN)
+            list(APPEND _compile_flags /fsanitize=address)
+            list(APPEND _enabled_names ASan)
+        endif()
+        if(ENABLE_UBSAN)
+            message(WARNING "Sanitizers: ENABLE_UBSAN is not supported on MSVC and will be ignored")
+        endif()
+        if(ENABLE_TSAN)
+            message(WARNING "Sanitizers: ENABLE_TSAN is not supported on MSVC and will be ignored")
+        endif()
+    else()
+        if(ENABLE_ASAN)
+            list(APPEND _compile_flags -fsanitize=address -fno-omit-frame-pointer)
+            list(APPEND _link_flags -fsanitize=address)
+            list(APPEND _enabled_names ASan)
+        endif()
+        if(ENABLE_UBSAN)
+            list(APPEND _compile_flags
+                -fsanitize=undefined
+                -fno-sanitize-recover=undefined
+                -fno-omit-frame-pointer)
+            list(APPEND _link_flags -fsanitize=undefined)
+            list(APPEND _enabled_names UBSan)
+        endif()
+        if(ENABLE_TSAN)
+            list(APPEND _compile_flags -fsanitize=thread -fno-omit-frame-pointer)
+            list(APPEND _link_flags -fsanitize=thread)
+            list(APPEND _enabled_names TSan)
+        endif()
+    endif()
+
+    if(NOT _compile_flags)
+        return()
+    endif()
+
+    list(REMOVE_DUPLICATES _compile_flags)
+    if(_link_flags)
+        list(REMOVE_DUPLICATES _link_flags)
+    endif()
+
+    foreach(_target IN LISTS ARG_TARGETS)
+        if(NOT TARGET "${_target}")
+            message(FATAL_ERROR "Sanitizer target does not exist: ${_target}")
+        endif()
+        target_compile_options("${_target}" PRIVATE ${_compile_flags})
+    endforeach()
+
+    if(_link_flags)
+        foreach(_target IN LISTS ARG_LINK_TARGETS)
+            if(NOT TARGET "${_target}")
+                message(FATAL_ERROR "Sanitizer link target does not exist: ${_target}")
+            endif()
+            target_link_options("${_target}" PRIVATE ${_link_flags})
+        endforeach()
+    endif()
+
+    string(JOIN ", " _enabled_summary ${_enabled_names})
+    message(STATUS "Sanitizers: Enabled (${_enabled_summary})")
+endfunction()
